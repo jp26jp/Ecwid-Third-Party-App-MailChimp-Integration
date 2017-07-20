@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>MailChimp Ecwid Application Integration</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://djqizrxa6f10j.cloudfront.net/ecwid-sdk/js/1.2.1/ecwid-app.js"></script>
+</head>
+<body>
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script>
+
+  $(document).ready(function() {
+
+  	/* Initialize the app */
+  	EcwidApp.init({
+  		app_id: "awesome-app-name",
+  		autoloadedflag: true,
+  		autoheight: true
+  	});
+
+    const storeData 						 = EcwidApp.getPayload();
+    const storeId 							 = storeData.store_id;
+    const accessToken 					 = storeData.access_token;
+    const apiAplicationStatusURL = 'https://app.ecwid.com/api/v3/' + storeId + '/application?token=' + accessToken;
+
+    $.ajax({
+      url: apiAplicationStatusURL,
+      dataType: 'json',
+      success: function(data) {
+        let startDate				= data.subscription.startDate;
+        let expirationDate	= data.subscription.expirationDate;
+        let status					= data.subscription.status;
+        $.get(apiProfileURL, function(data){
+          let email 				= data.account.accountEmail;
+          let name 					= data.account.accountName;
+          let countryCode 	= data.company.countryCode;
+          let storeURL 			= data.generalInfo.storeUrl;
+          let mailchimpURL 	= "mailchimp_j-26.php";
+          $.post(mailchimpURL, {email : email, name : name, countryCode : countryCode, storeURL : storeURL, status : status, startDate : startDate, expirationDate: expirationDate});
+        });
+      }
+    });
+
+  });
+
+  </script>
+
+</body>
+</html>
